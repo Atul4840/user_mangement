@@ -103,7 +103,7 @@
                 </div>
                 <div class="modal-body">
 
-                    <input type="text" id="del_id">
+                    <input type="hidden" id="del_id">
                     <h4>Are you sure ? want to delete this data ?</h4>
 
                 </div>
