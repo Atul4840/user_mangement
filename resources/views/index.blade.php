@@ -16,6 +16,7 @@
 <body>
 
 
+
     <nav class="navbar navbar-expand-lg bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand text-light" href="#">Home</a>
@@ -40,7 +41,7 @@
         </div>
     </nav>
 
-
+<h2 style="text-align: center; margin-top:20px">User Management</h2>
 
     <!-- Modal -->
     <div class="modal fade" id="Add_modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
