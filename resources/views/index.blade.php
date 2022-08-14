@@ -75,8 +75,8 @@
                                 aria-describedby="emailHelp">
                         </div>
                         <div>
-                            <input type="checkbox" style="margin-bottom: 20px">
-                            <label for="exampleInputEmail1" class="form-label">Still Working</label>
+                            <input type="checkbox" name="still_work" id="still" value="Still working" style="margin-bottom: 20px">
+                            <label for="checkbox" class="form-label">Still Working</label>
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Upload Image</label>
@@ -94,8 +94,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -104,7 +103,7 @@
                 </div>
                 <div class="modal-body">
 
-                    <input type="text" id="del_id" >
+                    <input type="text" id="del_id">
                     <h4>Are you sure ? want to delete this data ?</h4>
 
                 </div>
@@ -170,8 +169,9 @@
                                 '"  height="70px" width="70px" style="border-radius: 70px"  /></td>';
                             li += '<td>' + item.name + '</td>';
                             li += '<td>' + item.email + '</td>';
-                            li += ' <td id="ex">'+item.experience+'</td>';
-                            li += ' <td><button class=" btn btn-danger delete_btn" value="'+item.id+'">Delete</button></td>';
+                            li += ' <td id="ex">' + item.experience + '</td>';
+                            li += ' <td><button class=" btn btn-danger delete_btn" value="' +
+                                item.id + '">Delete</button></td>';
                             li += '</tr>';
                         });
                         $('#user_tbl').append(li);
@@ -194,7 +194,7 @@
                 e.preventDefault();
 
                 var formData = new FormData(this);
-               // console.log(formData);
+                // console.log(formData);
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -236,36 +236,53 @@
             $(document).on('click', '.delete_btn', function(e) {
                 e.preventDefault();
                 var delete_id = $(this).val();
-            //alert(delete_id)
-            $('#del_id').val(delete_id);
+                //alert(delete_id)
+                $('#del_id').val(delete_id);
 
                 $('#deleteModal').modal('show')
             });
 
-            $(document).on('click','.delete', function (e) {
-            e.preventDefault();
+            $(document).on('click', '.delete', function(e) {
+                e.preventDefault();
 
-            var user_id = $('#del_id').val()
-            //console.log(id);
+                var user_id = $('#del_id').val()
+                //console.log(id);
 
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                $.ajax({
+                    type: "get",
+                    url: "{{ url('delete') }}" + '/' + user_id,
+                    success: function(response) {
+                        //console.log(response)
+                        $('#success_message').text(response.message);
+                        $('#success_message').addClass('alert alert-success');
+                        $("#deleteModal").modal('hide');
+                        FetchUsers();
+                    }
+                });
             });
 
-            $.ajax({
-                type: "get",
-                url: "{{ url('delete') }}"+'/'+ user_id,
-                success: function (response) {
-                    //console.log(response)
-                    $('#success_message').text(response.message);
-                    $('#success_message').addClass('alert alert-success');
-                    $("#deleteModal").modal('hide');
-                    FetchUsers();
-                }
-            });
-        });
+
+
+                $("#still").click(function() {
+                    $("#dateofleaving").attr('disabled', !$("#dateofleaving").attr('disabled'));
+                    // $("#dateofleaving").removeClass("grey");
+
+
+                });
+
+                $("#dateofleaving").click(function() {
+                    $("#still").attr('disabled', !$("#still").attr('disabled'));
+                    // $("#dateofleaving").removeClass("grey");
+
+
+                });
+
 
         });
     </script>

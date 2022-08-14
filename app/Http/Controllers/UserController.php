@@ -18,15 +18,21 @@ class UserController extends Controller
 
         $validator = validator::make($request->all(),
             [
+
+                // 'old_image'=>'required_if:image,=,null',
+                //  'image'=>'required_if:old_image,=,null'
+
+
                 'name' => 'required|regex:/^[a-zA-ZÑñ\s]+$/',
                 'email' => 'required|email',
                 'dateofjoin' => 'required',
-                'dateofleaving' => 'required',
-                'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'dateofleaving' => 'required_if:still_work,=,null',
+                'still_work'=>'required_if:dateofleaving,=,null',
+                'file' => 'required|image|mimes:jpeg,png',
             ], [
                 'dateofjoin.required' => 'date of joining field is required',
                 'dateofleaving.required' => 'date of leaving field is required',
-
+                'name.regex' => 'only alphabets are allowed',
             ]);
         if ($validator->fails()) {
             return response()->json([
@@ -35,35 +41,62 @@ class UserController extends Controller
             ]);
         } else {
 
+            if ($request->still_work!= null) {
+                $files = $request->file('file');
+                $name = $files->getClientOriginalName();
+                $path = $files->move(public_path('image'), $name);
+
+                // $startdate = date_create($request->dateofjoin);
+                // $enddate = date_create($request->dateofleaving);
+
+                // $diff = (date_diff($startdate, $enddate));
+
+                // $experience = $diff->format("%y year %m month");
+
+                //    return $experience;
+
+                $user = new User;
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->date_of_join = $request->date_of_join;
+                $user->experience = $request->still_work;
+                $user->image = $name;
+                $user->save();
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'User has been submitted',
+                ]);
+            }else{
+                $files = $request->file('file');
+                $name = $files->getClientOriginalName();
+                $path = $files->move(public_path('image'), $name);
+
+                $startdate = date_create($request->dateofjoin);
+                $enddate = date_create($request->dateofleaving);
+
+                $diff = (date_diff($startdate, $enddate));
+
+                $experience = $diff->format("%y year %m month");
+
+                //    return $experience;
+
+                $user = new User;
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->experience = $experience;
+                $user->image = $name;
+                $user->save();
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'User has been submitted',
+                ]);
 
 
+            }
 
 
-            $files = $request->file('file');
-            $name = $files->getClientOriginalName();
-            $path = $files->move(public_path('image'), $name);
-
-            $startdate= date_create($request->dateofjoin);
-           $enddate= date_create($request->dateofleaving);
-
-           $diff = (date_diff($startdate,$enddate));
-
-           $experience=$diff->format("%y year %m month");
-
-        //    return $experience;
-
-
-            $user = new User;
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->experience =$experience;
-            $user->image = $name;
-            $user->save();
-
-            return response()->json([
-                'status' => 200,
-                'message' => 'User has been submitted',
-            ]);
         }
 
     }
@@ -93,7 +126,6 @@ class UserController extends Controller
         //         $ex=$diff;
         //     }
 
-
         //     $e = [];
         //     foreach ($ex as $t) {
         //         $e[] = $t;
@@ -101,7 +133,6 @@ class UserController extends Controller
         //     $o=json_encode($e,true);
 
         //     print_r($o);
-
 
         // }
 
@@ -111,11 +142,12 @@ class UserController extends Controller
         ]);
     }
 
-    function destroy($id){
+    public function destroy($id)
+    {
         $delete = User::find($id)->delete();
         return response()->json([
-            'status'=> ' 200',
-            'message'=> 'Student deleted '
+            'status' => ' 200',
+            'message' => 'Student deleted ',
         ]);
-      }
+    }
 }
